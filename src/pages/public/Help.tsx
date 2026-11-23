@@ -1,0 +1,8 @@
+import { Link } from 'react-router-dom';
+import { Page } from '../../components/ui';
+
+import { useState } from 'react';
+const FAQS=[['How do I send money?','Log in, go to Send, enter a GlowIDE username, email or wallet address, choose an asset and network, and confirm. Demo transfers are labelled SIMULATED.'],['Is this real money?','No. This demo uses simulated and testnet data only. No real money moves.'],['What is Arc?','Arc is GlowIDE’s primary blockchain. This demo uses Arc Testnet, where USDC is the native gas token.'],['How do refunds work?','Open Transactions, select a transaction and request a refund. Refunds need authorisation and verified settlement evidence in production.'],['How do I contact support?','Use the Contact page or open a support ticket from the Help Center. In this demo, tickets are stored locally.'],['Where are API keys stored?','Server-side only, encrypted, managed in Admin → API & Integrations. They are never in frontend code or responses.']];
+export default function Help(){ const [open,setOpen]=useState(0);
+ return <Page><section className="mx-auto max-w-4xl px-4 py-16"><h1 className="text-4xl font-bold text-slate-900 dark:text-white">Help Center</h1><p className="mt-3 text-slate-600 dark:text-slate-300">Answers to common questions. Still stuck? <a className="text-violet-600 underline" href="/contact">Contact us</a>.</p>
+ <div className="mt-8 space-y-3">{FAQS.map((f,i)=>(<div key={i} className="card p-5"><button className="w-full text-left font-semibold text-slate-900 dark:text-white" onClick={()=>setOpen(open===i?-1:i)}>{f[0]}</button>{open===i&&<p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{f[1]}</p>}</div>))}</div></section></Page>; }

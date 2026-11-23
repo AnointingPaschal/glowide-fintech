@@ -1,0 +1,26 @@
+# GlowIDE Worker — wrangler.toml (placeholders: create resources before deploy)
+name = "glowide-worker"
+main = "workers/index.ts"
+compatibility_date = "2026-11-23"
+# D1 — create first: wrangler d1 create glowide_db  (then paste database_id)
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "glowide_db"
+# database_id = "PASTE_DATABASE_ID_HERE"
+# KV — wrangler kv namespace create glowide_kv
+# [[kv_namespaces]]
+# binding = "KV"
+# id = "PASTE_KV_ID_HERE"
+# R2 — wrangler r2 bucket create glowide-files
+# [[r2_buckets]]
+# binding = "R2"
+# bucket_name = "glowide-files"
+# Queues (placeholders)
+# [[queues.producers]]
+# binding = "PAYMENTS_QUEUE"
+# queue = "glowide-payments"
+# Secrets (never in this file): wrangler secret put OPENROUTER_API_KEY
+# wrangler secret put ENCRYPTION_KEY  (master key for encrypted_credentials — never in DB)
+# wrangler secret put ARC_RPC_URL / BASE_RPC_URL / ETHEREUM_RPC_URL / SOLANA_RPC_URL / CIRCLE_API_KEY
+[vars]
+ENVIRONMENT = "demo"

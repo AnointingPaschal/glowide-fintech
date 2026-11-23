@@ -1,0 +1,16 @@
+
+import { useState } from 'react';
+import { Page, DemoBadge, ModeBadge, Empty } from '../../components/ui';
+import { useStore, getState } from '../../lib/store';
+import { fmtUSD } from '../../lib/format';
+export default function Transactions(){
+ const {txs}=useStore(); const [q,setQ]=useState(''); const [status,setStatus]=useState('all'); const [sel,setSel]=useState<string|null>(null);
+ const list=txs.filter(t=>(status==='all'||t.status===status)&&(t.counterparty.toLowerCase().includes(q.toLowerCase())||t.type.toLowerCase().includes(q.toLowerCase())||t.id.includes(q)));
+ const s=sel? getState().txs.find(t=>t.id===sel):undefined;
+ return <Page><div className="flex flex-wrap justify-between gap-3"><h1 className="text-2xl font-bold text-slate-900 dark:text-white">Transactions</h1><DemoBadge/></div>
+ <div className="mt-4 flex flex-wrap gap-2"><input className="input !w-64" placeholder="Search counterparty, type or ID…" value={q} onChange={e=>setQ(e.target.value)}/><select className="input !w-40" value={status} onChange={e=>setStatus(e.target.value)}><option value="all">All statuses</option><option value="completed">Completed</option><option value="pending">Pending</option><option value="failed">Failed</option><option value="refunded">Refunded</option></select></div>
+ {list.length===0? <div className="mt-4"><Empty title="No transactions match" sub="Try a different search or status filter."/></div>:
+ <div className="card mt-4 divide-y dark:divide-white/10">{list.map(t=>(<button key={t.id} onClick={()=>setSel(t.id)} className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-slate-50 dark:hover:bg-white/5"><div><p className="font-medium text-slate-900 dark:text-white">{t.type} · {t.counterparty}</p><p className="text-xs text-slate-400">{t.date} · {t.network} · {t.id}</p></div><div className="text-right"><p className="font-semibold text-slate-900 dark:text-white">{fmtUSD(t.amount)} {t.asset}</p><span className="badge bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300">{t.status}</span> <ModeBadge mode={t.mode}/></div></button>))}</div>}
+ {s&&<div className="card mt-4 p-6"><h2 className="font-bold text-slate-900 dark:text-white">Receipt — {s.id}</h2><dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2"><dt className="text-slate-400">Type</dt><dd>{s.type}</dd><dt className="text-slate-400">Counterparty</dt><dd>{s.counterparty}</dd><dt className="text-slate-400">Amount</dt><dd>{fmtUSD(s.amount)} {s.asset}</dd><dt className="text-slate-400">Network</dt><dd>{s.network}</dd><dt className="text-slate-400">Status</dt><dd>{s.status}</dd><dt className="text-slate-400">Mode</dt><dd><ModeBadge mode={s.mode}/></dd><dt className="text-slate-400">Idempotency key</dt><dd className="break-all">{s.idempotencyKey}</dd><dt className="text-slate-400">Note</dt><dd>{s.note||'—'}</dd></dl><p className="mt-3 text-xs text-slate-400">This receipt is for a {s.mode.toLowerCase()} transaction. It is not proof of a real blockchain settlement.</p><div className="mt-4 flex gap-2"><button className="btn-secondary" onClick={()=>window.print()}>Print / save receipt</button><button className="btn-ghost" onClick={()=>setSel(null)}>Close</button></div></div>}
+ </Page>;
+}

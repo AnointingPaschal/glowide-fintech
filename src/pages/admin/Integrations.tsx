@@ -1,0 +1,16 @@
+
+import { useState } from 'react';
+import { Page } from '../../components/ui';
+import { maskKey } from '../../lib/format';
+const PROVIDERS=[{id:'openrouter',name:'OpenRouter',endpoint:'https://openrouter.ai/api/v1'},{id:'arc-rpc',name:'Arc RPC provider',endpoint:'https://rpc.testnet.arc.network'},{id:'circle',name:'Circle (USDC / CCTP)',endpoint:'https://api.circle.com'},{id:'email',name:'Email provider',endpoint:'(configure in production)'},{id:'sms',name:'SMS provider',endpoint:'(configure in production)'},{id:'payments',name:'Payment gateway',endpoint:'(configure in production)'},{id:'fx',name:'Exchange-rate provider',endpoint:'(configure in production)'},{id:'analytics',name:'Analytics',endpoint:'(configure in production)'}];
+export default function AdminIntegrations(){
+ const [cfg,setCfg]=useState<Record<string,{key:string;enabled:boolean;status:string;lastOk:string;lastErr:string;updated:string}>>({});
+ type Cfg={key:string;enabled:boolean;status:string;lastOk:string;lastErr:string;updated:string};
+ const defaults:Cfg={key:'',enabled:false,status:'not configured',lastOk:'—',lastErr:'—',updated:'—'};
+ const set=(id:string,p:Partial<Cfg>)=>setCfg({...cfg,[id]:Object.assign({},defaults,cfg[id]||{},p)});
+ const test=(id:string)=>{ const c=cfg[id]; if(!c?.key){ set(id,{status:'error',lastErr:'No key entered (demo — no real key stored)'}); return;} set(id,{status:'ok (simulated)',lastOk:new Date().toISOString(),lastErr:'—',updated:new Date().toISOString()}); };
+ return <Page><h1 className="text-2xl font-bold text-slate-900 dark:text-white">API &amp; Integrations</h1><p className="mt-1 text-sm text-slate-500">Demo only. <strong>Never enter a real production key here in the demo build.</strong> In production, keys are encrypted server-side, stored in <code>encrypted_credentials</code> with the master key as a Worker secret, and displayed masked only. Test-connection here is simulated.</p>
+ <div className="mt-6 space-y-4">{PROVIDERS.map(p=>{ const c=cfg[p.id]||{key:'',enabled:false,status:'not configured',lastOk:'—',lastErr:'—',updated:'—'}; return <div key={p.id} className="card p-5"><div className="flex flex-wrap justify-between gap-3"><div><p className="font-semibold text-slate-900 dark:text-white">{p.name}</p><p className="text-xs text-slate-400">{p.endpoint}</p></div><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={c.enabled} onChange={e=>set(p.id,{enabled:e.target.checked})}/> Enabled</label></div>
+ <div className="mt-3 grid gap-3 sm:grid-cols-2"><div><label className="label">API key (masked after saving — demo)</label><input className="input" type="password" placeholder="sk-••••••••" value={c.key} onChange={e=>set(p.id,{key:e.target.value})}/>{c.key&&<p className="mt-1 text-xs text-slate-400">Stored as masked (demo): {maskKey(c.key)}</p>}</div><div className="flex items-end gap-2"><button className="btn-secondary" onClick={()=>test(p.id)}>Test connection (simulated)</button><button className="btn-ghost" onClick={()=>{set(p.id,{key:'',status:'not configured'});}}>Delete / rotate (demo)</button></div></div>
+ <p className="mt-2 text-xs text-slate-400">Status: {c.status} · Last success: {c.lastOk} · Last error: {c.lastErr} · Updated: {c.updated}</p></div>;})}</div></Page>;
+}
